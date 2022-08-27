@@ -28,7 +28,20 @@ class StartFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
 
+
+        binding = FragmentStartBinding.inflate(layoutInflater, container, false)
+        adapter = AdapterNote()
+        recycler = binding.recyclerView
+        recycler.adapter = adapter
+        recycler.layoutManager = LinearLayoutManager(requireContext())
+
+        val mViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
+        mViewModel.myLiveNotes.observe(viewLifecycleOwner, { listNotes ->
+            listNotes.let { adapter.setList(listNotes) }
+        })
+
         //Swipe fun
+
 
         val swipeGesture = object : SwipeGesture() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -36,36 +49,26 @@ class StartFragment : Fragment() {
                 when (direction){
                     ItemTouchHelper.LEFT -> {
                         Toast.makeText(requireContext(), "Swipe Left", Toast.LENGTH_LONG).show()
+                        val noteToDelete = adapter.listOfNotes[viewHolder.adapterPosition]
+                        mViewModel.deleteNote(noteToDelete)
+                        adapter.notifyDataSetChanged()
                     }
 
                     ItemTouchHelper.RIGHT -> {
                         Toast.makeText(requireContext(), "Swipe Right", Toast.LENGTH_LONG).show()
+                        adapter.notifyDataSetChanged()
                     }
                 }
             }
         }
 
         val touchHelper = ItemTouchHelper(swipeGesture)
-
-
-
-        val mViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
-
-        binding = FragmentStartBinding.inflate(layoutInflater, container, false)
-        adapter = AdapterNote()
-        recycler = binding.recyclerView
-        recycler.adapter = adapter
-        recycler.layoutManager = LinearLayoutManager(requireContext())
         touchHelper.attachToRecyclerView(recycler)
 
-        mViewModel.myLiveNotes.observe(viewLifecycleOwner, { listNotes ->
-            listNotes.let { adapter.setList(listNotes) }
-        })
 
         binding.addNote.setOnClickListener {
             findNavController().navigate(R.id.action_startFragment_to_addNoteFragment)
         }
-
 
 
         return binding.root
