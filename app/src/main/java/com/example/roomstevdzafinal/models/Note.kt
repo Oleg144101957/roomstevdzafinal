@@ -4,10 +4,11 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.roomstevdzafinal.data.TABLE_NAME
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-@Entity(tableName = "note_table")
+@Entity(tableName = TABLE_NAME)
 data class Note(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
